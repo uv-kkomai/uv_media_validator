@@ -32,7 +32,7 @@ module UvMediaValidator::Validator
 
     # height
 
-    def hegiht
+    def height
       raise "not implements"
     end
 

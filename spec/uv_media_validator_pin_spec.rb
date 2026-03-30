@@ -81,7 +81,7 @@ RSpec.describe 'Pinterest' do
     path = 'test/pin_videos'
     ary = %w[30s_1280x1024.mov 30s_1280x1024.m4v 4s_1280x1024.mp4]
     ary.each do |f|
-      media = UvMediaValidator::FbVideo.new(File.join(path, f))
+      media = UvMediaValidator::PinVideo.new(File.join(path, f))
       expect(media.all?).to eq(true), "cause #{f}"
     end
   end
