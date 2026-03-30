@@ -28,6 +28,7 @@ RSpec.describe 'Pinterest' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'video rotation support', UvMediaValidator::PinVideo
   it_behaves_like 'exif orientation support', UvMediaValidator::PinImage
 
   it 'pin image big file size' do

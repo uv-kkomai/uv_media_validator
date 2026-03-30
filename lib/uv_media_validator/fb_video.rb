@@ -1,11 +1,12 @@
-require 'image_size'
+require 'streamio-ffmpeg'
 
 module UvMediaValidator
   # https://developers.facebook.com/docs/graph-api/video-uploads?locale=ja_JP
   class FbVideo
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
-    
+    prepend UvMediaValidator::Validator::VideoRotation
+
     # 1Gb
     MAX_SYNC_SIZE = 1 * 1024 * 1024 * 1024
 
@@ -14,7 +15,7 @@ module UvMediaValidator
 
     MIN_WIDTH = 120
     MIN_HEIGHT = 120
-    
+
     MAX_SYNC_DURATION = 1200.0
     MAX_ASYNC_DURATION = 3600.0 * 4.0
     MAX_ASPECT_RATIO = 16.0 / 9.0
@@ -44,14 +45,6 @@ module UvMediaValidator
 
     def duration?
       max_duration >= video_info.duration
-    end
-
-    def width
-      video_info.width
-    end
-
-    def height
-      video_info.height
     end
 
     def format?

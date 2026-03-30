@@ -28,6 +28,9 @@ RSpec.describe 'Instagram' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'video rotation support', UvMediaValidator::IgVideo
+  it_behaves_like 'video rotation support', UvMediaValidator::IgReel
+  it_behaves_like 'video rotation support', UvMediaValidator::IgStoriesVideo
   it_behaves_like 'exif orientation support', UvMediaValidator::IgImage
 
   it 'ig image wrong aspect ratio (1 : 2) and wrong format' do

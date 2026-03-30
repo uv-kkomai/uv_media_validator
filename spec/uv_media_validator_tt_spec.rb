@@ -24,6 +24,7 @@ RSpec.describe 'TikTok' do
 
   it_behaves_like 'exif orientation support', UvMediaValidator::TtImage
   it_behaves_like 'exif orientation support', UvMediaValidator::TtThumbnail
+  it_behaves_like 'video rotation support', UvMediaValidator::TtVideo
 
   describe 'TtImage' do
     it 'valid portrait image' do

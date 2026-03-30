@@ -1,4 +1,4 @@
-require 'image_size'
+require 'streamio-ffmpeg'
 
 module UvMediaValidator
   # TikTok video validator
@@ -6,6 +6,7 @@ module UvMediaValidator
   class TtVideo
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::VideoRotation
 
     FORMAT_ARRAY = %i(mp4 mov webm)
     MIN_FRAME_RATE = 23
@@ -36,14 +37,6 @@ module UvMediaValidator
 
     def duration?
       (self.class::MIN_DURATION..self.class::MAX_DURATION).include?(video_info.duration)
-    end
-
-    def width
-      video_info.width
-    end
-
-    def height
-      video_info.height
     end
 
     def min_width?

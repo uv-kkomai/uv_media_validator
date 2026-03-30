@@ -17,6 +17,7 @@ RSpec.describe 'Twitter' do
     expect(media.all?).to eq(false)
   end
 
+  it_behaves_like 'video rotation support', UvMediaValidator::TwVideo
   it_behaves_like 'exif orientation support', UvMediaValidator::TwImage
 
   it "tw image with fullsize EXIF orientation 6 returns rotated dimensions" do

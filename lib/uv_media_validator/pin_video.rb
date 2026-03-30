@@ -7,6 +7,7 @@ module UvMediaValidator
   class PinVideo
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::VideoRotation
 
     # APIの制限はAdsの仕様はこちらだが、リリース直後は少なめでいく。
     # https://help.pinterest.com/en/business/article/pinterest-product-specs
@@ -47,14 +48,6 @@ module UvMediaValidator
 
     def file_size
       video_info.size
-    end
-
-    def width
-      video_info.width
-    end
-
-    def height
-      video_info.height
     end
 
     def format?
