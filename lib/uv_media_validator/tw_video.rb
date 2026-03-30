@@ -5,6 +5,7 @@ module UvMediaValidator
   class TwVideo
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::VideoRotation
 
     # 15Mb
     MAX_SYNC_SIZE = 15 * 1024 * 1024
@@ -42,14 +43,6 @@ module UvMediaValidator
 
     def file_size
       video_info.size
-    end
-
-    def width
-      video_info.width
-    end
-
-    def height
-      video_info.height
     end
 
     def audio_codec_profile

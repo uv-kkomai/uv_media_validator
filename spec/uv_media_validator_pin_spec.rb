@@ -28,6 +28,9 @@ RSpec.describe 'Pinterest' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'video rotation support', UvMediaValidator::PinVideo
+  it_behaves_like 'exif orientation support', UvMediaValidator::PinImage
+
   it 'pin image big file size' do
     media = UvMediaValidator::PinImage.new('test/pin_images/9038x9900_20MbyteOver.jpg')
     expect(media.file_size?).to eq(false)
@@ -81,7 +84,7 @@ RSpec.describe 'Pinterest' do
     path = 'test/pin_videos'
     ary = %w[30s_1280x1024.mov 30s_1280x1024.m4v 4s_1280x1024.mp4]
     ary.each do |f|
-      media = UvMediaValidator::FbVideo.new(File.join(path, f))
+      media = UvMediaValidator::PinVideo.new(File.join(path, f))
       expect(media.all?).to eq(true), "cause #{f}"
     end
   end

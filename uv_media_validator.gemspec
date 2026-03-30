@@ -43,4 +43,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "image_size", "~> 2.0"
   spec.add_dependency "gif-info", "~> 0.1"
   spec.add_dependency "streamio-ffmpeg", "~> 3.0"
+  spec.add_dependency "exifr", "~> 1.5"
 end

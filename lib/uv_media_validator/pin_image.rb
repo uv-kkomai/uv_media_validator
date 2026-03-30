@@ -5,6 +5,7 @@ module UvMediaValidator
   class PinImage
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::ExifOrientation
 
     MAX_SIZE = 20 * 1024 * 1024 # 20Mb
     FORMAT_ARRAY = %i(bmp jpeg png tiff webp)
@@ -37,14 +38,6 @@ module UvMediaValidator
 
     def max_size
       MAX_SIZE
-    end
-
-    def width
-      image_size.width
-    end
-
-    def height
-      image_size.height
     end
 
     def image_size

@@ -1,9 +1,10 @@
-require 'image_size'
+require 'streamio-ffmpeg'
 
 module UvMediaValidator
   class IgVideo
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::VideoRotation
 
     FORMAT_ARRAY = %i(mp4 mov)
     AUDIO_CODEC = 'aac'
@@ -42,14 +43,6 @@ module UvMediaValidator
 
     def duration?
       (self.class::MIN_DURATION..self.class::MAX_DURATION).include?(video_info.duration)
-    end
-
-    def width
-      video_info.width
-    end
-
-    def height
-      video_info.height
     end
 
     def aspect_ratio?
