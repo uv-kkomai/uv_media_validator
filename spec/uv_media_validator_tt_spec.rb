@@ -22,6 +22,9 @@ RSpec.describe 'TikTok' do
     expect(media).to eq(nil)
   end
 
+  it_behaves_like 'exif orientation support', UvMediaValidator::TtImage
+  it_behaves_like 'exif orientation support', UvMediaValidator::TtThumbnail
+
   describe 'TtImage' do
     it 'valid portrait image' do
       media = UvMediaValidator::TtImage.new('test/tt_images/valid_1080x1920.jpg')

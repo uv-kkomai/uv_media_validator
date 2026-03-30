@@ -17,6 +17,23 @@ RSpec.describe 'Twitter' do
     expect(media.all?).to eq(false)
   end
 
+  it_behaves_like 'exif orientation support', UvMediaValidator::TwImage
+
+  it "tw image with fullsize EXIF orientation 6 returns rotated dimensions" do
+    # fullsize_exif_rotated.jpg: file pixels 1280x1024, EXIF Orientation=6
+    # display size should be 1024x1280
+    media = UvMediaValidator::TwImage.new('test/tw_images/fullsize_exif_rotated.jpg')
+    expect(media.width).to eq(1024)
+    expect(media.height).to eq(1280)
+  end
+
+  it "tw image PNG returns raw dimensions (no EXIF support)" do
+    media = UvMediaValidator::TwImage.new('test/tw_images/50.png')
+    raw_size = ImageSize.path('test/tw_images/50.png')
+    expect(media.width).to eq(raw_size.w)
+    expect(media.height).to eq(raw_size.h)
+  end
+
   it "tw image big file size" do
     media = UvMediaValidator::TwImage.new("test/tw_images/51.png")
     expect(media.file_size?).to eq(false)

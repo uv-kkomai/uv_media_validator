@@ -6,6 +6,7 @@ module UvMediaValidator
   class TtImage
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::ExifOrientation
 
     # 20MB
     MAX_SIZE = 20 * 1024 * 1024
@@ -38,14 +39,6 @@ module UvMediaValidator
 
     def file_size
       @file_size ||= FileTest.size?(@path)
-    end
-
-    def width
-      image_size.w
-    end
-
-    def height
-      image_size.h
     end
 
     def format?

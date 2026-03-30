@@ -13,6 +13,8 @@ RSpec.describe 'Facebook' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'exif orientation support', UvMediaValidator::FbImage
+
   it "fb image big file size" do
     media = UvMediaValidator::FbImage.new("test/fb_images/101.png")
     expect(media.file_size?).to eq(false)

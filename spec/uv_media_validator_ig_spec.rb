@@ -28,6 +28,8 @@ RSpec.describe 'Instagram' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'exif orientation support', UvMediaValidator::IgImage
+
   it 'ig image wrong aspect ratio (1 : 2) and wrong format' do
     media = UvMediaValidator::IgImage.new('test/ig_images/100x200.gif')
     expect(media.file_size?).to eq(true)
@@ -390,6 +392,8 @@ RSpec.describe 'Instagram' do
 
   describe 'Stories' do
     describe 'Image' do
+      it_behaves_like 'exif orientation support', UvMediaValidator::IgStoriesImage
+
       it 'ig image valid aspect ratio (1 : 2) and wrong format' do
         media = UvMediaValidator::IgStoriesImage.new('test/ig_images/100x200.gif')
         expect(media.file_size?).to eq(true)

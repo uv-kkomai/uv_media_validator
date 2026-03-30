@@ -5,6 +5,7 @@ module UvMediaValidator
   class TwImage
     include UvMediaValidator::Validator::FileSize
     include UvMediaValidator::Validator::ViewSize
+    prepend UvMediaValidator::Validator::ExifOrientation
 
     # 5Mb
     MAX_SIZE = 5 * 1024 * 1024
@@ -26,14 +27,6 @@ module UvMediaValidator
 
     def file_size
       @file_size ||= FileTest.size?(@path)
-    end
-
-    def width
-      image_size.w
-    end
-
-    def height
-      image_size.h
     end
 
     def format?

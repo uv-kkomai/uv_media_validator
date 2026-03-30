@@ -28,6 +28,8 @@ RSpec.describe 'Pinterest' do
     expect(media.all?).to eq(true)
   end
 
+  it_behaves_like 'exif orientation support', UvMediaValidator::PinImage
+
   it 'pin image big file size' do
     media = UvMediaValidator::PinImage.new('test/pin_images/9038x9900_20MbyteOver.jpg')
     expect(media.file_size?).to eq(false)
