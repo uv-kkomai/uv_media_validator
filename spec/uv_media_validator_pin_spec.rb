@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# === SAR テストフィクスチャ仕様（ffprobe 出力に基づく） ===
+# 4s_1000x1000.mp4: coded 1000x1000, SAR 1:1,  DAR 1:1,     display 1000x1000
+# 4s_2000x1000.mp4: coded 2000x1000, SAR 1:1,  DAR 2:1,     display 2000x1000
+# 4s_500x1002.mp4:  coded 500x1002,  SAR 1:1,  DAR 250:501, display 500x1002
+# 4s_1800x900.mp4:  coded 1800x900,  SAR 8:9,  DAR 16:9,    display 1600x900
+# 4s_1920x1920.mp4: coded 1920x1920, SAR 16:9, DAR 16:9,    display 3413x1920
+
 # rubocop:disable Metrics/BlockLength
 RSpec.describe 'Pinterest' do
   it 'has a version number' do
@@ -7,13 +14,20 @@ RSpec.describe 'Pinterest' do
   end
 
   it 'get_pin_validator' do
-    media = UvMediaValidator.get_pin_validator('test/pin_videos/4s_1920x1920.mp4')
+    media = UvMediaValidator.get_pin_validator('test/pin_videos/4s_1000x1000.mp4')
     expect(media.class.name).to eq('UvMediaValidator::PinVideo')
     expect(media.all?).to eq(true)
 
     media = UvMediaValidator.get_pin_validator('test/pin_images/9038x9900.jpg')
     expect(media.class.name).to eq('UvMediaValidator::PinImage')
     expect(media.all?).to eq(true)
+  end
+
+  it 'get_pin_validator rejects video with SAR-inflated width exceeding MAX_WIDTH' do
+    # coded 1920x1920, SAR 16:9 → display 3413x1920 (exceeds MAX_WIDTH=1920)
+    media = UvMediaValidator.get_pin_validator('test/pin_videos/4s_1920x1920.mp4')
+    expect(media.class.name).to eq('UvMediaValidator::PinVideo')
+    expect(media.all?).to eq(false)
   end
 
   it 'get_pin_validator (H264)' do
@@ -53,8 +67,9 @@ RSpec.describe 'Pinterest' do
     end
   end
 
-  it 'pin video wrong aspect_ratio (for 1.91 / 1.0)' do
-    media = UvMediaValidator::PinVideo.new('test/pin_videos/4s_1800x900.mp4')
+  it 'pin video wrong aspect_ratio (for 1.91 / 1.0) with SAR 1:1' do
+    # coded & display 2000x1000, ratio=2.0 > MAX_ASPECT_RATIO=1.91
+    media = UvMediaValidator::PinVideo.new('test/pin_videos/4s_2000x1000.mp4')
     expect(media.file_size?).to eq(true)
     expect(media.duration?).to eq(true)
     expect(media.aspect_ratio?).to eq(false)
@@ -62,13 +77,20 @@ RSpec.describe 'Pinterest' do
     expect(media.all?).to eq(false)
   end
 
-  it 'pin video wrong aspect_ratio (for 1.0 / 2.0)' do
-    media = UvMediaValidator::PinVideo.new('test/pin_videos/4s_900x1801.mp4')
+  it 'pin video wrong aspect_ratio (for 1.0 / 2.0) with SAR 1:1' do
+    # coded & display 500x1002, ratio=0.499 < MIN_ASPECT_RATIO=0.5
+    media = UvMediaValidator::PinVideo.new('test/pin_videos/4s_500x1002.mp4')
     expect(media.file_size?).to eq(true)
     expect(media.duration?).to eq(true)
     expect(media.aspect_ratio?).to eq(false)
     expect(media.format?).to eq(true)
     expect(media.all?).to eq(false)
+  end
+
+  it 'pin video with non-square SAR has correct display aspect_ratio' do
+    # coded 1800x900, SAR 8:9 → display 1600x900, ratio=1.778 (within [0.5, 1.91])
+    media = UvMediaValidator::PinVideo.new('test/pin_videos/4s_1800x900.mp4')
+    expect(media.aspect_ratio?).to eq(true)
   end
 
   it 'pin video bad duration' do

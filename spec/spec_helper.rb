@@ -20,6 +20,7 @@ RSpec.shared_context 'video_rotation_metadata' do
     {
       streams: [{
         codec_type: 'video',
+        width: 1920, height: 1080,
         side_data_list: [{
           side_data_type: 'Display Matrix',
           rotation: -90
@@ -31,7 +32,8 @@ RSpec.shared_context 'video_rotation_metadata' do
   let(:metadata_without_rotation) do
     {
       streams: [{
-        codec_type: 'video'
+        codec_type: 'video',
+        width: 1920, height: 1080
       }]
     }
   end
@@ -40,6 +42,7 @@ RSpec.shared_context 'video_rotation_metadata' do
     {
       streams: [{
         codec_type: 'video',
+        width: 1920, height: 1080,
         side_data_list: [{
           side_data_type: 'Display Matrix',
           rotation: 180
@@ -50,6 +53,30 @@ RSpec.shared_context 'video_rotation_metadata' do
 
   let(:metadata_with_no_streams) do
     {}
+  end
+
+  let(:metadata_with_sar_no_rotation) do
+    {
+      streams: [{
+        codec_type: 'video',
+        width: 720, height: 480,
+        sample_aspect_ratio: '32:27'
+      }]
+    }
+  end
+
+  let(:metadata_with_sar_and_rotation) do
+    {
+      streams: [{
+        codec_type: 'video',
+        width: 720, height: 480,
+        sample_aspect_ratio: '32:27',
+        side_data_list: [{
+          side_data_type: 'Display Matrix',
+          rotation: -90
+        }]
+      }]
+    }
   end
 end
 
@@ -74,7 +101,8 @@ RSpec.shared_examples 'video rotation support' do |klass|
     expect(media.height).to eq(1080)
   end
 
-  it 'returns streamio-ffmpeg dimensions when tags[:rotate] is present' do
+  it 'returns rotated dimensions based on coded size when tags[:rotate] is present' do
+    # coded: 1920x1080, rotate=90 → streamio-ffmpeg returns width=1080,height=1920
     movie = double('FFMPEG::Movie',
       rotation: 90, width: 1080, height: 1920,
       size: 1000, metadata: metadata_with_rotation)
@@ -99,6 +127,26 @@ RSpec.shared_examples 'video rotation support' do |klass|
     media = klass.new('dummy.mp4', info: movie)
     expect(media.width).to eq(1920)
     expect(media.height).to eq(1080)
+  end
+
+  it 'returns SAR-adjusted width when SAR is non-square (no rotation)' do
+    movie = double('FFMPEG::Movie',
+      rotation: nil, width: 720, height: 480,
+      size: 1000, metadata: metadata_with_sar_no_rotation)
+    media = klass.new('dummy.mp4', info: movie)
+    # coded 720x480, SAR 32:27 → display 853x480
+    expect(media.width).to eq(853)
+    expect(media.height).to eq(480)
+  end
+
+  it 'returns rotated SAR-adjusted dimensions with SAR and rotation' do
+    movie = double('FFMPEG::Movie',
+      rotation: nil, width: 720, height: 480,
+      size: 1000, metadata: metadata_with_sar_and_rotation)
+    media = klass.new('dummy.mp4', info: movie)
+    # coded 720x480, SAR 32:27 → 853x480 → rotated -90° → [480, 853]
+    expect(media.width).to eq(480)
+    expect(media.height).to eq(853)
   end
 end
 
